@@ -18,6 +18,9 @@ export function Home() {
         <li>
           <Link to="/checkers">Play Checkers</Link>
         </li>
+        <li>
+          <Link to="/backgammon">Play Backgammon</Link>
+        </li>
       </ul>
     </main>
   );

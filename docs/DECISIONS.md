@@ -70,3 +70,30 @@ summary and "what I'd do next" sections are finalised at the end of the project.
 - **Building a jump click by click.** The human clicks the piece, then each landing square; only steps
   that continue a legal path are accepted, Esc or clicking the piece again undoes, and the move submits
   itself when the path is complete. Pieces about to be captured are dimmed while the jump is built.
+
+## Backgammon
+
+- **Points from P1's side, steps in the mover's own numbering.** The state stores 24 signed counts
+  from Ivory's point of view; every step uses the mover's numbers (25 = bar, 0 = off), matching how
+  players write moves. A bar entry with a die of n lands on the mover's point 25 − n, the opponent's
+  n-point.
+- **Turn generation follows the brief's recipe:** DFS over both dice orders (four steps for doubles),
+  keep the longest sequences (max-dice rule), and if only one die fits, keep the larger.
+- **The client gets a step graph, not every ordering.** Doubles can be played in thousands of orders:
+  measured over 300 games, the worst roll had 9,085 ordered sequences (1.8 MB of JSON). The server
+  now merges orderings that reach the same intermediate position into a graph (worst case 62 KB,
+  average under 2 KB). The client walks it one checker step at a time, so any legal order is
+  accepted and nothing illegal is offered. `legalMoves` lists one turn per distinct result, and the
+  server still validates the submitted turn against every legal ordering.
+- **Passing is automatic and announced.** A roll with no legal play, or being closed out, passes the
+  turn inside the engine and is recorded as a notice in the state, which the client turns into a
+  short toast. A closed-out player doesn't roll at all.
+- **Standard scoring, not the PDF's.** Single 1, gammon 2, backgammon 3. The rulebook's "count the
+  loser's remaining checkers" variant is not used.
+- **No doubling cube in v1.** A deliberate cut: single games only, so no Crawford or money-play rules.
+- **Hard** prunes to the eight best candidates by the static evaluation, then scores each by the
+  opponent's best reply averaged over all 21 rolls. In a pure race it plays greedily on pip count,
+  which is close to optimal there.
+- **Checkers have identities on the client.** Each checker gets an id from a base position, replayed
+  through the steps since then, so moves, hits (to the bar) and bear-offs (to the tray) all slide.
+  Stacks over five show a count badge instead of overflowing the point.

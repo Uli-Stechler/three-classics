@@ -34,8 +34,11 @@ export interface GameSession<S, M> {
   canMove: boolean;
   /** The human has made at least one move in an unfinished game. */
   hasProgress: boolean;
-  /** Plays a move. If given, `preview` is drawn immediately while the server confirms. */
-  play: (move: M, preview?: S) => void;
+  /**
+   * Plays a move. If given, `preview` is drawn immediately while the server confirms. Set
+   * `awaitsReply: false` for moves that don't hand the turn over, such as rolling the dice.
+   */
+  play: (move: M, preview?: S, options?: { awaitsReply?: boolean }) => void;
   /** Starts a new game with changed preferences, or a rematch of the current one. */
   restart: (changes?: Partial<Prefs>, options?: { rematch?: boolean }) => void;
 }
@@ -45,6 +48,8 @@ interface SessionOptions<S, M> {
   defaults?: Partial<Prefs>;
   /** How long the board takes to animate one event, in ms. */
   eventDuration: (event: GameEvent<S, M>) => number;
+  /** Called as each event is shown, e.g. to announce a passed turn. */
+  onEvent?: (event: GameEvent<S, M>) => void;
 }
 
 /** The computer's reply is shown no sooner than this after the human moves, so it feels natural. */
@@ -59,7 +64,7 @@ export function activeGameId(type: GameType): string | null {
   return readJson<string | null>(gameKey(type), null);
 }
 
-export function useGameSession<S, M>({ type, defaults, eventDuration }: SessionOptions<S, M>): GameSession<S, M> {
+export function useGameSession<S, M>({ type, defaults, eventDuration, onEvent }: SessionOptions<S, M>): GameSession<S, M> {
   const toast = useToast();
   const [game, setGame] = useState<GameView<S, M> | null>(null);
   const [shown, setShown] = useState<Shown<S, M> | null>(null);
@@ -79,6 +84,8 @@ export function useGameSession<S, M>({ type, defaults, eventDuration }: SessionO
   const gameRef = useRef<GameView<S, M> | null>(null);
   const durationRef = useRef(eventDuration);
   durationRef.current = eventDuration;
+  const onEventRef = useRef(onEvent);
+  onEventRef.current = onEvent;
 
   const show = useCallback((state: S, move: M | null, side: Side | null, animate: boolean) => {
     seq.current += 1;
@@ -104,6 +111,7 @@ export function useGameSession<S, M>({ type, defaults, eventDuration }: SessionO
       if (previewed && events.length > 0 && HUMAN_ACTORS.includes(events[0].actor)) {
         // Already on screen from the preview; take the server's version without replaying it.
         show(events[0].state, events[0].move, events[0].side, false);
+        onEventRef.current?.(events[0]);
         events = events.slice(1);
       } else if (!previewed && events.length > 0) {
         show(result.before, null, null, false);
@@ -119,6 +127,7 @@ export function useGameSession<S, M>({ type, defaults, eventDuration }: SessionO
           setThinking(false);
         }
         show(event.state, event.move, event.side, true);
+        onEventRef.current?.(event);
         await sleep(durationRef.current(event));
         if (run !== runId.current) return;
       }
@@ -207,7 +216,7 @@ export function useGameSession<S, M>({ type, defaults, eventDuration }: SessionO
   }, [type]);
 
   const play = useCallback(
-    (move: M, preview?: S) => {
+    (move: M, preview?: S, options: { awaitsReply?: boolean } = {}) => {
       const current = gameRef.current;
       if (!current || busy) return;
       const run = ++runId.current;
@@ -215,7 +224,7 @@ export function useGameSession<S, M>({ type, defaults, eventDuration }: SessionO
       setBusy(true);
       setGame({ ...current, legalMoves: [] });
       if (preview) show(preview, move, current.sideToMove, true);
-      if (current.mode === 'VS_AI') setThinking(true);
+      if (current.mode === 'VS_AI' && options.awaitsReply !== false) setThinking(true);
 
       api
         .move<S, M>(current.id, current.version, move)

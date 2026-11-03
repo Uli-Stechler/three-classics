@@ -59,7 +59,55 @@ export const checkers: GameFixture = {
   win: (page) => clickSquares(page, 'c3', 'e5'),
 };
 
-export const GAMES: GameFixture[] = [connectFour, checkers];
+/** Rolls if asked, then plays any legal turn by following the board's own hints. */
+async function playBackgammonTurn(page: Page) {
+  const roll = page.getByRole('button', { name: /^Roll/ });
+  const movable = page.getByRole('button', { name: /can move$/ });
+  const destination = page.getByRole('button', { name: /move here$/ });
+  const confirm = page.getByRole('button', { name: 'Confirm' });
+  // The Roll button is swapped for Undo/Confirm after a roll, so never wait on it.
+  const canRoll = async () => (await roll.count()) > 0 && (await roll.isEnabled({ timeout: 100 }).catch(() => false));
+  const canAct = async () => (await movable.count()) > 0 || (await canRoll());
+
+  await expect.poll(canAct).toBe(true);
+  if (await canRoll()) {
+    await roll.click();
+    await expect.poll(canAct).toBe(true);
+    // No legal moves: the turn passed and the computer has already replied.
+    if ((await movable.count()) === 0) return;
+  }
+  for (let i = 0; i < 8 && !(await confirm.isEnabled()); i++) {
+    if ((await destination.count()) === 0) await movable.first().click();
+    await destination.first().click();
+  }
+  await confirm.click();
+}
+
+export const backgammon: GameFixture = {
+  name: 'Backgammon',
+  path: '/backgammon',
+  type: 'BACKGAMMON',
+  move: playBackgammonTurn,
+  nearWin: {
+    // Ivory's last checker sits on its 1-point; any roll bears it off.
+    state: {
+      points: Array.from({ length: 24 }, (_, i) => (i === 0 ? 1 : i === 18 ? -15 : 0)),
+      barP1: 0,
+      barP2: 0,
+      offP1: 14,
+      offP2: 0,
+      sideToMove: 'P1',
+      phase: 'ROLL',
+      dice: [],
+      opening: null,
+      notices: [],
+      lastTurn: null,
+    },
+  },
+  win: playBackgammonTurn,
+};
+
+export const GAMES: GameFixture[] = [connectFour, checkers, backgammon];
 
 export function moveItems(page: Page): Locator {
   return page.getByRole('list', { name: 'Move list' }).getByRole('listitem');

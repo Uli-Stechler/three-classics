@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { ToastProvider } from '../components/Toast';
+import { BackgammonPage } from '../games/backgammon/BackgammonPage';
 import { CheckersPage } from '../games/checkers/CheckersPage';
 import { ConnectFourPage } from '../games/connect-four/ConnectFourPage';
 import { Home } from '../pages/Home';
@@ -14,6 +15,7 @@ export function App() {
             <Route path="/" element={<Home />} />
             <Route path="/connect-four" element={<ConnectFourPage />} />
             <Route path="/checkers" element={<CheckersPage />} />
+            <Route path="/backgammon" element={<BackgammonPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>

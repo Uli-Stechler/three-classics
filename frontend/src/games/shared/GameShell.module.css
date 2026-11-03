@@ -49,20 +49,28 @@
 
 .stage {
   --below-h: 0px;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-3);
 }
 
+/* Controls under the board get a matching spacer above it, so the board itself stays centred. */
 .stage:has(.below) {
   --below-h: 56px;
+}
+
+.stage:has(.below)::before {
+  content: '';
+  flex: none;
+  height: 44px;
 }
 
 .board {
   width: min(
     100cqw - 2 * var(--gutter),
-    (100cqh - 2 * var(--gutter) - var(--below-h)) * var(--aspect),
+    (100cqh - 2 * var(--gutter) - 2 * var(--below-h)) * var(--aspect),
     var(--board-max-h) * var(--aspect)
   );
   aspect-ratio: var(--aspect);
@@ -216,7 +224,7 @@
   }
 
   .boardColumn:has(.below) {
-    --below-extra: 56px;
+    --below-extra: 112px;
   }
 
   .panel {

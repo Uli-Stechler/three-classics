@@ -33,6 +33,8 @@ export interface GameView<S, M> {
   sideToMove: Side;
   state: S;
   legalMoves: M[];
+  /** For moves built step by step (backgammon turns), the legal steps as a graph. */
+  moveGraph: unknown;
   outcome: Outcome | null;
   lastMove: HistoryEntry<M> | null;
   history: HistoryEntry<M>[];
