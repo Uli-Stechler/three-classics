@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: three-classics
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/threeclassics}
+    username: ${DB_USER:threeclassics}
+    password: ${DB_PASSWORD:threeclassics}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+  flyway:
+    enabled: true
+  mvc:
+    problemdetails:
+      enabled: true
+
+server:
+  port: 8080
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+games:
+  # Hard must answer in about a second and never take more than two.
+  ai-budget-ms: 1000

@@ -1,0 +1,8 @@
+* text=auto
+# Shell scripts run inside Linux containers and must keep LF endings.
+mvnw text eol=lf
+*.sh text eol=lf
+Makefile text eol=lf
+mvnw.cmd text eol=crlf
+*.png binary
+*.pdf binary
