@@ -1,7 +1,63 @@
 # Decisions
 
-A running log of decisions made while building, newest at the bottom of each section. The
-summary and "what I'd do next" sections are finalised at the end of the project.
+## The main decisions
+
+1. **The server is the referee.** All rules and all computer play are in the Java backend. The client
+   draws the state, offers only the server's `legalMoves`, and sends back the one the player picked;
+   the server validates, applies, lets the computer reply and persists, in one transaction. One source
+   of truth, rules that are unit-tested in isolation, and no way to cheat from the browser.
+2. **Multi-step moves are legal paths matched by prefix.** A checkers multi-jump arrives as a complete
+   path; the client accepts a click only if the squares so far are a prefix of some legal path, and
+   submits when a path is complete. Backgammon turns use the same idea through a step graph, because
+   listing every ordering of a double was measured at up to 1.8 MB (see Backgammon below).
+3. **Boards are single SVGs with a fixed viewBox.** Cells and pieces are drawn in fixed coordinates and
+   the SVG scales as a whole, so nothing can change size with content. Highlights are fills, rings and
+   transforms only, and a Playwright layout test checks every cell's size and position across moves.
+4. **Scenes are procedural, not photos.** Each theme is layered SVG silhouettes plus CSS gradients and
+   one particle canvas, all driven by a single shared `requestAnimationFrame` loop that pauses when
+   the tab is hidden. That keeps the repo free of licensing questions, scales to any screen and can
+   go fully still for reduced motion. A licensed photo could be dropped in via `--scene-photo`.
+5. **Three games, one engine interface.** `GameEngine<S, M>` and `AiPlayer<S, M>` are implemented per
+   game and registered as a `GameModule`. The service, API, persistence, session hook and page shell
+   are written once; each game adds an engine, an AI, a board and its rules text.
+
+## Trade-offs
+
+- **No doubling cube.** Backgammon is played as single games, scored 1/2/3 for single, gammon and
+  backgammon. The cube (and the Crawford, Jacoby and beaver rules that come with matches and money
+  play) was the first thing to cut for time.
+- **Standard scoring rather than the reference PDF's.** The PDF scores a game by counting the loser's
+  remaining checkers; the brief and standard play use single/gammon/backgammon, so that's what is used.
+- **No accounts.** One local player; stats are computed from finished games in the database.
+- **Spring Boot 3.5, not 4.x**, to keep to APIs I know well inside the time budget.
+- **No Docker on the build machine.** Everything except the containers was run and tested (backend
+  against a local PostgreSQL 16, Playwright against the dev server and the production bundle). The
+  Dockerfiles, compose file and Kubernetes manifests are written and their YAML is validated, but
+  `docker compose up` and kind were not run here. That is the first thing to verify.
+- **AI depth is budgeted, not fixed.** Hard searches as deep as it can in about 0.85 s, so its strength
+  depends a little on the machine. Medium and Easy are deterministic in effort.
+- **The client draws its own move before the server confirms it.** This keeps input instant. It never
+  decides legality (the move comes from the server's list), and it always snaps to the server's state.
+
+## What I'd do next
+
+- Run `docker compose up --build` and `make k8s-up` on a machine with Docker and fix anything they turn
+  up; then add CI (GitHub Actions) running the Maven suite with Testcontainers, Vitest, and Playwright
+  against the compose stack.
+- The stretch goals in order: a Hint button (ask Hard), takeback (undo the last move pair from history),
+  optional sound, then the backgammon doubling cube.
+- Stronger computer play: an opening book and transposition table for checkers, a perfect-play Connect
+  Four solver for Hard, and a 3-ply or learned evaluation for backgammon.
+- Property-based tests (random positions) comparing engine invariants, and a replay test that rebuilds
+  every stored game from its move history.
+- Small UX: double-click a backgammon checker to play the larger die, and announce the computer's
+  move to screen readers in words ("Computer played c3 to d4").
+
+---
+
+## Log (as built)
+
+Decisions made along the way, by area.
 
 ## Environment and tooling
 
@@ -25,8 +81,9 @@ summary and "what I'd do next" sections are finalised at the end of the project.
   same shape a real game site uses to stop cheating.
 - **One `GameEngine<S, M>` interface for three games.** Each game is a `GameModule` (engine, AI, JSON
   types). `GameService` is written once against the interface; adding a game means adding a module bean.
-- **Create returns the same envelope as a move** (`{ game, events }` rather than a bare `GameView`). When
-  the computer moves first, its opening move arrives as an event and animates like any other reply.
+- **Create returns the same envelope as a move** (`{ game, before, events }` rather than a bare
+  `GameView`). When the computer moves first, its opening move arrives as an event and animates like
+  any other reply; `before` is the position to animate from.
 - **Rematches go through the server.** `POST /api/games` takes an optional `rematchOf`; the rule that a
   Connect Four rematch swaps who goes first lives in `RematchPolicy` and is unit-tested.
 - **Optimistic locking twice over.** Each move names the version it was based on (409 on mismatch, which
