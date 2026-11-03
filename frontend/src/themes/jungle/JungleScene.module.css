@@ -1,0 +1,116 @@
+/* Misty sky: deep canopy shade above, mist on the horizon. */
+.sky {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #16301f 0%, #2c5136 22%, #7fa287 44%, #d7e4d9 60%, #a9c3ac 72%, #4c7a55 86%, #0f2619 100%);
+}
+
+.ridges {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Atmospheric perspective: far karst is pale and hazy, near layers darker. */
+.far {
+  fill: #b8ccbb;
+  opacity: 0.85;
+}
+
+.mid {
+  fill: #6f9577;
+}
+
+.canopy {
+  fill: #24492f;
+}
+
+.shafts {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* Soft light shafts whose opacity breathes over 8–12 s. */
+.shaft {
+  position: absolute;
+  top: -20%;
+  width: 9%;
+  height: 120%;
+  background: linear-gradient(180deg, rgba(246, 244, 220, 0.45), rgba(246, 244, 220, 0) 80%);
+  filter: blur(18px);
+  transform: rotate(18deg);
+  transform-origin: top center;
+  opacity: 0.35;
+  will-change: opacity;
+  animation: breathe ease-in-out infinite alternate;
+}
+
+@keyframes breathe {
+  from {
+    opacity: 0.15;
+  }
+  to {
+    opacity: 0.45;
+  }
+}
+
+/* Mist bands drifting across on 60–90 s loops. */
+.mist {
+  position: absolute;
+  left: -40%;
+  width: 180%;
+  height: 16%;
+  background: radial-gradient(ellipse at center, rgba(235, 242, 236, 0.55), transparent 68%);
+  filter: blur(16px);
+  will-change: transform;
+  animation: drift linear infinite alternate;
+}
+
+@keyframes drift {
+  from {
+    transform: translateX(-10%);
+  }
+  to {
+    transform: translateX(10%);
+  }
+}
+
+/* Fronds sway ±2° from the base of the stem. */
+.frond {
+  position: absolute;
+  aspect-ratio: 400 / 420;
+  transform-origin: 50% 100%;
+  transform: translateX(-50%) rotate(var(--rest));
+  will-change: transform;
+  animation: sway ease-in-out infinite alternate;
+}
+
+.frond svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+@keyframes sway {
+  from {
+    transform: translateX(-50%) rotate(calc(var(--rest) - 2deg));
+  }
+  to {
+    transform: translateX(-50%) rotate(calc(var(--rest) + 2deg));
+  }
+}
+
+.leaf {
+  fill: #0f2619;
+}
+
+.bamboo {
+  fill: #1b3b27;
+}
+
+[data-mode='thumbnail'] .frond {
+  display: none;
+}
