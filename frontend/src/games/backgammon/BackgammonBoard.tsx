@@ -151,7 +151,8 @@ export const BackgammonBoard = forwardRef<SVGSVGElement, BackgammonBoardProps>(f
   }
 
   return (
-    <svg ref={ref} viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} className={styles.board} role="group" aria-label="Backgammon board">
+    <svg ref={ref} viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} className={styles.board} tabIndex={-1}
+      role="group" aria-label="Backgammon board">
       <defs>
         <filter id="bg-lift" x="-50%" y="-50%" width="200%" height="200%">
           <feDropShadow dx="0" dy="8" stdDeviation="6" floodColor="#000" floodOpacity="0.4" />

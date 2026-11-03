@@ -97,3 +97,14 @@ summary and "what I'd do next" sections are finalised at the end of the project.
 - **Checkers have identities on the client.** Each checker gets an id from a base position, replayed
   through the steps since then, so moves, hits (to the bar) and bear-offs (to the tray) all slide.
   Stacks over five show a count badge instead of overflowing the point.
+
+## Polish
+
+- **Ambient motion follows the system until the player chooses.** The setting is only saved once it is
+  toggled, so a later `prefers-reduced-motion` change still applies to anyone who never touched it.
+- **Accessibility is tested, not just intended.** A Playwright spec drives Connect Four and Checkers
+  entirely from the keyboard, checks the result modal traps focus and returns it, opens a game from
+  the home page with Tab and Enter, and confirms every scene is static under reduced motion.
+- **Contrast was measured.** All text/surface pairs in the four themes clear WCAG AA (most are 8:1 or
+  better). The home page's lagoon teal was deepened from #2F8F86 to #287A72 so white button text
+  reaches 5.1:1.

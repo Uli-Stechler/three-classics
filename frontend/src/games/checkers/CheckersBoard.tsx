@@ -103,7 +103,8 @@ export const CheckersBoard = forwardRef<SVGSVGElement, CheckersBoardProps>(funct
   const selected = prefix.length > 0 ? prefix[0] : -1;
 
   return (
-    <svg ref={ref} viewBox={`0 0 ${VIEW} ${VIEW}`} className={styles.board} role="group" aria-label="Checkers board">
+    <svg ref={ref} viewBox={`0 0 ${VIEW} ${VIEW}`} className={styles.board} tabIndex={-1}
+      role="group" aria-label="Checkers board">
       <defs>
         <filter id="ck-lift" x="-50%" y="-50%" width="200%" height="200%">
           <feDropShadow dx="0" dy="10" stdDeviation="7" floodColor="#000" floodOpacity="0.45" />

@@ -86,6 +86,7 @@ export const ConnectFourBoard = forwardRef<SVGSVGElement, ConnectFourBoardProps>
       ref={ref}
       viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
       className={styles.board}
+      tabIndex={-1}
       role="group"
       aria-label="Connect Four board"
       onPointerLeave={() => setHover(null)}

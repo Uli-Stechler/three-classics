@@ -42,8 +42,9 @@ a {
   outline-offset: 2px;
 }
 
-/* SVG board cells draw their own focus ring. */
-svg :focus-visible {
+/* SVG board cells draw their own focus ring; the board itself only receives focus back from dialogs. */
+svg :focus-visible,
+svg[role='group']:focus {
   outline: none;
 }
 

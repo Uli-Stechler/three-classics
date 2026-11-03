@@ -15,16 +15,27 @@ function prefersReducedMotion(): boolean {
 }
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
-  const [ambientMotion, setAmbientMotion] = useState<boolean>(() => {
-    const stored = readJson<{ ambientMotion?: boolean }>(STORAGE_KEY, {});
-    return stored.ambientMotion ?? !prefersReducedMotion();
-  });
+  // Until the player chooses, follow the system's reduced-motion preference (and its changes).
+  const [choice, setChoice] = useState<boolean | undefined>(() => readJson<{ ambientMotion?: boolean }>(STORAGE_KEY, {}).ambientMotion);
+  const [reduced, setReduced] = useState(prefersReducedMotion);
 
   useEffect(() => {
-    writeJson(STORAGE_KEY, { ambientMotion });
-  }, [ambientMotion]);
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const onChange = () => setReduced(query.matches);
+    query.addEventListener('change', onChange);
+    return () => query.removeEventListener('change', onChange);
+  }, []);
 
-  const value = useMemo(() => ({ ambientMotion, setAmbientMotion }), [ambientMotion]);
+  const value = useMemo(
+    () => ({
+      ambientMotion: choice ?? !reduced,
+      setAmbientMotion: (on: boolean) => {
+        setChoice(on);
+        writeJson(STORAGE_KEY, { ambientMotion: on });
+      },
+    }),
+    [choice, reduced],
+  );
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
 }
 
