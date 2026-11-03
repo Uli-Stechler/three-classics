@@ -49,6 +49,8 @@ export interface GameEvent<S, M> {
 
 export interface MoveResult<S, M> {
   game: GameView<S, M>;
+  /** The state before the first event. */
+  before: S;
   events: GameEvent<S, M>[];
 }
 

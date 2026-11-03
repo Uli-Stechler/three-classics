@@ -6,11 +6,9 @@
   contain: strict;
 }
 
-.scene svg {
+.layers {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
 }
 
 /* A licensed photo can be dropped in later by setting one variable. */
@@ -32,11 +30,20 @@
   animation-play-state: paused !important;
 }
 
-/* Darkens and desaturates the backdrop by roughly half, strongest behind the board. */
+/* Behind a board the scene is a backdrop: desaturated, then darkened most behind the board. */
+.scene[data-scrim='true'] > .photo,
+.scene[data-scrim='true'] > .layers,
+.scene[data-scrim='true'] > .canvas {
+  filter: saturate(0.55);
+}
+
 .scrim {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(ellipse 70% 75% at 45% 55%, var(--ui-scrim) 0%, color-mix(in srgb, var(--ui-scrim) 55%, transparent) 70%, color-mix(in srgb, var(--ui-scrim) 35%, transparent) 100%);
-  backdrop-filter: saturate(0.55);
+  background: radial-gradient(
+    ellipse 65% 70% at var(--scrim-x, 50%) 55%,
+    var(--ui-scrim) 0%,
+    color-mix(in srgb, var(--ui-scrim) 70%, transparent) 60%,
+    color-mix(in srgb, var(--ui-scrim) 40%, transparent) 100%
+  );
 }

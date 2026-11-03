@@ -1,0 +1,63 @@
+import { expect, type APIRequestContext, type Locator, type Page } from '@playwright/test';
+
+/** Everything the shared specs need to know about one game. */
+export interface GameFixture {
+  name: string;
+  path: string;
+  type: 'CONNECT_FOUR' | 'CHECKERS' | 'BACKGAMMON';
+  /** Makes one legal human move (a whole turn). */
+  move: (page: Page) => Promise<void>;
+  /** A dev-endpoint position one move from a human win, and that winning move. */
+  nearWin: { state: unknown; humanSide?: 'P1' | 'P2' };
+  win: (page: Page) => Promise<void>;
+}
+
+export const connectFour: GameFixture = {
+  name: 'Connect Four',
+  path: '/connect-four',
+  type: 'CONNECT_FOUR',
+  move: async (page) => {
+    await page.getByRole('button', { name: /^Column 4,/ }).click();
+  },
+  nearWin: {
+    state: {
+      columns: [['P1', 'P2'], ['P1', 'P2'], ['P1', 'P2'], [], [], [], []],
+      sideToMove: 'P1',
+      winningLines: [],
+      lastDrop: null,
+    },
+  },
+  win: async (page) => {
+    await page.getByRole('button', { name: /^Column 4,/ }).click();
+  },
+};
+
+export const GAMES: GameFixture[] = [connectFour];
+
+export function moveItems(page: Page): Locator {
+  return page.getByRole('list', { name: 'Move list' }).getByRole('listitem');
+}
+
+/** Plays the fixture's move and waits until the computer has answered and it's the human's turn. */
+export async function playAndAwaitReply(page: Page, game: GameFixture) {
+  const before = await moveItems(page).count();
+  await game.move(page);
+  await expect.poll(() => moveItems(page).count()).toBeGreaterThanOrEqual(before + 2);
+  await waitForHumanTurn(page);
+}
+
+export async function waitForHumanTurn(page: Page) {
+  await expect(page.getByTestId('panel').getByText(/^(Your turn|.+ to move)$/)).toBeVisible();
+}
+
+/** Creates a game from a custom position (dev profile only) and makes the page resume it. */
+export async function startFromPosition(page: Page, request: APIRequestContext, game: GameFixture) {
+  const response = await request.post('/api/dev/games', {
+    data: { game: { type: game.type, difficulty: 'EASY', humanSide: game.nearWin.humanSide }, state: game.nearWin.state },
+  });
+  expect(response.ok()).toBeTruthy();
+  const { game: view } = await response.json();
+  await page.goto('/');
+  await page.evaluate(([type, id]) => localStorage.setItem(`tc.game.${type}`, JSON.stringify(id)), [game.type, view.id]);
+  await page.goto(game.path);
+}

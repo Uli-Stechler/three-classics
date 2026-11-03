@@ -33,3 +33,23 @@ summary and "what I'd do next" sections are finalised at the end of the project.
   stops double clicks), and JPA `@Version` guards concurrent writes as a backstop.
 - **Events carry a state snapshot.** Each event in a response includes the state right after it, so the
   client animates event by event and snaps to server truth after each one.
+- **The client previews only what it was offered.** When the human picks a move, the board draws it
+  at once (a dropped disc, a slid checker) so input never waits on the network or the AI. The server
+  still validates it, and the board snaps to the server's state from the response.
+- **Shared game shell.** Top bar, centred board column, side panel, rules drawer, confirm dialogs and the
+  result modal are one component (`GameShell`) plus one hook (`useGameSession`). Each game supplies its
+  board, side names, swatches and rules. Connect Four set the pattern; the others reuse it unchanged.
+
+## Connect Four
+
+- **AI levels follow the solved game.** With perfect play the first player wins by opening in the
+  centre, so Hard always opens there. Medium opens in one of the three middle columns and then picks
+  at random among moves within a few points of its best, so games vary. Easy plays randomly but takes
+  a win or blocks one about half the time each.
+- **Hard's search** is negamax with alpha-beta on a bitboard, a transposition table, centre-first move
+  ordering and iterative deepening against an 85% slice of the one-second budget. An explicit
+  "win now, else block a single threat" check runs first, which is exactly what the tests demand.
+- **Discs fall behind the frame.** The SVG draws hole backs, then discs, then the frame with round
+  holes cut out, so a falling disc is only visible through the holes, like the real thing.
+- **Colour plus shape.** Gold discs carry a centre dot, so the two sides differ by more than colour.
+  The turn marker in the panel is a bar as well as a highlight.

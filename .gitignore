@@ -14,3 +14,6 @@ frontend/playwright-report/
 
 # Pinterest moodboards are for reference only and are not ours to redistribute.
 docs/reference/moodboards/
+
+# Local agent tooling
+.claude/

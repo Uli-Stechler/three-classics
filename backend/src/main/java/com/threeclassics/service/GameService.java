@@ -113,9 +113,10 @@ public class GameService {
         S state = customState == null ? module.engine().initialState() : parse(customState, module.stateType());
         GameEntity game = games.save(
                 new GameEntity(module.type(), request.mode(), request.difficulty(), humanSide, write(state)));
+        S before = state;
         List<GameEvent> events = new ArrayList<>();
         state = letComputerPlay(module, game, state, 0, events);
-        return persist(module, game, state, events);
+        return persist(module, game, before, state, events);
     }
 
     private <S, M> MoveResult play(GameModule<S, M> module, GameEntity game, JsonNode moveJson) {
@@ -126,10 +127,11 @@ public class GameService {
         }
         M move = parseMove(moveJson, module.moveType());
         int ply = (int) moves.countByGameId(game.getId());
+        S before = state;
         List<GameEvent> events = new ArrayList<>();
         state = applyAndRecord(module, game, state, move, ply++, events);
         state = letComputerPlay(module, game, state, ply, events);
-        return persist(module, game, state, events);
+        return persist(module, game, before, state, events);
     }
 
     /** In games against the computer, plays computer moves until it is the human's turn again. */
@@ -155,11 +157,11 @@ public class GameService {
         return next;
     }
 
-    private <S, M> MoveResult persist(GameModule<S, M> module, GameEntity game, S state, List<GameEvent> events) {
+    private <S, M> MoveResult persist(GameModule<S, M> module, GameEntity game, S before, S state, List<GameEvent> events) {
         game.setState(write(state));
         module.engine().outcome(state).ifPresent(o -> game.finish(o.winner(), o.reason(), o.points()));
         games.saveAndFlush(game);
-        return new MoveResult(view(module, game, state), events);
+        return new MoveResult(view(module, game, state), before, events);
     }
 
     private <S, M> GameView viewOf(GameModule<S, M> module, GameEntity game) {

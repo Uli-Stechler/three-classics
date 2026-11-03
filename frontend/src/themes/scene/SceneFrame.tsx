@@ -24,9 +24,9 @@ interface SceneFrameProps extends SceneProps {
  */
 export function SceneFrame({ name, mode = 'full', animate, scrim = false, particles, children }: SceneFrameProps) {
   return (
-    <div className={styles.scene} data-scene={name} data-mode={mode} data-animate={animate} aria-hidden="true">
+    <div className={styles.scene} data-scene={name} data-mode={mode} data-animate={animate} data-scrim={scrim} aria-hidden="true">
       <div className={styles.photo} />
-      {children}
+      <div className={styles.layers}>{children}</div>
       {particles && <ParticleCanvas create={particles} animate={animate} className={styles.canvas} />}
       {scrim && <div className={styles.scrim} />}
     </div>
