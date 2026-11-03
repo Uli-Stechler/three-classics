@@ -2,6 +2,9 @@ package com.threeclassics.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.threeclassics.backgammon.BackgammonAi;
+import com.threeclassics.backgammon.BackgammonEngine;
+import com.threeclassics.backgammon.BackgammonState;
 import com.threeclassics.checkers.CheckersAi;
 import com.threeclassics.checkers.CheckersEngine;
 import com.threeclassics.checkers.CheckersState;
@@ -29,6 +32,20 @@ class SoakTest {
         soak(new CheckersEngine(), new CheckersAi(), (CheckersState before, CheckersState after) -> {
             assertThat(pieces(after, Side.P1)).isLessThanOrEqualTo(pieces(before, Side.P1));
             assertThat(pieces(after, Side.P2)).isLessThanOrEqualTo(pieces(before, Side.P2));
+        });
+    }
+
+    @Test
+    void backgammonGamesRunToCompletionWithFifteenCheckersEach() {
+        soak(new BackgammonEngine(), new BackgammonAi(), (BackgammonState before, BackgammonState after) -> {
+            int ivory = after.barP1() + after.offP1();
+            int obsidian = after.barP2() + after.offP2();
+            for (int count : after.points()) {
+                if (count > 0) ivory += count;
+                else obsidian -= count;
+            }
+            assertThat(ivory).isEqualTo(15);
+            assertThat(obsidian).isEqualTo(15);
         });
     }
 

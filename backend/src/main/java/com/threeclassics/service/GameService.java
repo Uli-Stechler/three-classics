@@ -192,7 +192,8 @@ public class GameService {
                 outcome.isPresent() ? GameStatus.FINISHED : GameStatus.IN_PROGRESS,
                 toMove,
                 state,
-                humansTurn ? List.copyOf(engine.legalMoves(state)) : List.of(),
+                humansTurn ? List.copyOf(engine.clientMoves(state)) : List.of(),
+                humansTurn ? engine.moveGraph(state) : null,
                 outcome.orElse(null),
                 history.isEmpty() ? null : history.getLast(),
                 history);

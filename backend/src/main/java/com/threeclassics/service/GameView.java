@@ -14,6 +14,7 @@ import java.util.UUID;
  *
  * @param legalMoves the moves the human may make now; empty while the computer is to move or
  *                   once the game is over
+ * @param moveGraph  for games whose moves are built step by step, the legal steps as a graph
  */
 public record GameView(
         UUID id,
@@ -26,6 +27,7 @@ public record GameView(
         Side sideToMove,
         Object state,
         List<?> legalMoves,
+        Object moveGraph,
         Outcome outcome,
         HistoryEntry lastMove,
         List<HistoryEntry> history) {

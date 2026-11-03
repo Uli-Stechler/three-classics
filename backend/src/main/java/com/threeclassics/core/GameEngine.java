@@ -31,6 +31,22 @@ public interface GameEngine<S, M> {
     /** Present once the game is over. */
     Optional<Outcome> outcome(S state);
 
+    /**
+     * The legal moves as offered to the client. Defaults to all of them; a game can collapse moves
+     * that lead to the same position (backgammon doubles can be played in thousands of orders).
+     */
+    default List<M> clientMoves(S state) {
+        return legalMoves(state);
+    }
+
+    /**
+     * An optional step-by-step structure the client walks to build a multi-step move, or null.
+     * Submitted moves are still validated against {@link #legalMoves}.
+     */
+    default Object moveGraph(S state) {
+        return null;
+    }
+
     /** Short human-readable notation for the move list, e.g. "c3×e5" or "24/18 13/9". */
     String notation(M move);
 
