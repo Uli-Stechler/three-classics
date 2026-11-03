@@ -34,7 +34,7 @@
   font-size: var(--text-xs);
 }
 
-.segment:not(:disabled):hover {
+.segment[aria-checked='false']:not(:disabled):hover {
   color: var(--ui-text);
 }
 

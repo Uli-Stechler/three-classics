@@ -32,7 +32,34 @@ export const connectFour: GameFixture = {
   },
 };
 
-export const GAMES: GameFixture[] = [connectFour];
+/** A 64-square checkers board with the given pieces, squares named as Dark sees them. */
+function checkersBoard(pieces: Record<string, string>): string {
+  const board = Array(64).fill('.');
+  for (const [name, piece] of Object.entries(pieces)) {
+    board[(8 - Number(name[1])) * 8 + (name.charCodeAt(0) - 97)] = piece;
+  }
+  return board.join('');
+}
+
+async function clickSquares(page: Page, ...names: string[]) {
+  for (const name of names) {
+    await page.getByRole('button', { name: new RegExp(`^${name},`) }).click();
+  }
+}
+
+export const checkers: GameFixture = {
+  name: 'Checkers',
+  path: '/checkers',
+  type: 'CHECKERS',
+  move: (page) => clickSquares(page, 'c3', 'd4'),
+  nearWin: {
+    // Dark takes Light's last piece.
+    state: { board: checkersBoard({ c3: 'd', d4: 'l' }), sideToMove: 'P1', quietPlies: 0, positions: null, lastMove: null },
+  },
+  win: (page) => clickSquares(page, 'c3', 'e5'),
+};
+
+export const GAMES: GameFixture[] = [connectFour, checkers];
 
 export function moveItems(page: Page): Locator {
   return page.getByRole('list', { name: 'Move list' }).getByRole('listitem');

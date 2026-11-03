@@ -53,3 +53,20 @@ summary and "what I'd do next" sections are finalised at the end of the project.
   holes cut out, so a falling disc is only visible through the holes, like the real thing.
 - **Colour plus shape.** Gold discs carry a centre dot, so the two sides differ by more than colour.
   The turn marker in the panel is a bar as well as a highlight.
+
+## Checkers
+
+- **Board as a 64-character string** (`d`/`D`/`l`/`L`/`.`), square = row × 8 + column with Dark at the
+  bottom. It is compact in JSON, readable in tests, and doubles as the repetition key.
+- **Draw bookkeeping lives in the state.** `quietPlies` counts plies since the last capture or man move
+  (80 = 40 each), and `positions` keeps the keys since then, so threefold repetition is a pure check.
+- **Captured pieces stay on the board until the move ends,** which is how American checkers works and
+  what stops a piece being jumped twice.
+- **The move list uses algebraic squares from Dark's side** ("c3×e5×g7") rather than 1–32 numbering,
+  because casual players read it more easily.
+- **Hard** is alpha-beta with iterative deepening and root move reordering, plus a capture extension so
+  exchanges resolve past the horizon. The evaluation adds back-row guard, centre control, mobility and,
+  in endgames, drives the leading side's kings toward the enemy so wins get converted.
+- **Building a jump click by click.** The human clicks the piece, then each landing square; only steps
+  that continue a legal path are accepted, Esc or clicking the piece again undoes, and the move submits
+  itself when the path is complete. Pieces about to be captured are dimmed while the jump is built.

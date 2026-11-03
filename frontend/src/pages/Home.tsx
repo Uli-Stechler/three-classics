@@ -15,6 +15,9 @@ export function Home() {
         <li>
           <Link to="/connect-four">Play Connect Four</Link>
         </li>
+        <li>
+          <Link to="/checkers">Play Checkers</Link>
+        </li>
       </ul>
     </main>
   );
