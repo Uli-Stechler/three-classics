@@ -14,6 +14,7 @@ frontend/playwright-report/
 
 # Pinterest moodboards are for reference only and are not ours to redistribute.
 docs/reference/moodboards/
+/jungle-rainforest.png
 
 # Local agent tooling
 .claude/

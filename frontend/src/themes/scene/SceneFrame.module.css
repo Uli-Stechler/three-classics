@@ -4,9 +4,20 @@
   overflow: hidden;
   pointer-events: none;
   contain: strict;
+  /* Props size and place themselves in cqw/cqh, relative to the scene, not the viewport. */
+  container-type: size;
+  /* How far props keep from the right edge: clear of the side panel on wide game pages. */
+  --right-inset: 0px;
 }
 
-.layers {
+@media (min-width: 1100px) {
+  .scene[data-mode='full'] {
+    --right-inset: calc(var(--panel-w) + var(--space-4));
+  }
+}
+
+.layers,
+.props {
   position: absolute;
   inset: 0;
 }
@@ -30,11 +41,28 @@
   animation-play-state: paused !important;
 }
 
+/* Crossers only exist while the scene moves, so they always restart off-screen. */
+.scene:not([data-animate='true']) [data-crosser] {
+  display: none;
+}
+
+@media (max-width: 599px) {
+  .scene [data-crosser],
+  .scene [data-secondary] {
+    display: none;
+  }
+}
+
 /* Behind a board the scene is a backdrop: desaturated, then darkened most behind the board. */
 .scene[data-scrim='true'] > .photo,
 .scene[data-scrim='true'] > .layers,
 .scene[data-scrim='true'] > .canvas {
   filter: saturate(0.55);
+}
+
+/* Props are muted a little less so they don't turn muddy; the scrim still sits on top of them. */
+.scene[data-scrim='true'] > .props {
+  filter: saturate(0.8);
 }
 
 .scrim {
