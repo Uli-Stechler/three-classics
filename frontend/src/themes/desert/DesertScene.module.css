@@ -22,7 +22,22 @@
   height: 100%;
 }
 
-/* Atmospheric perspective: the farthest dunes are palest. */
+/* Atmospheric perspective: the mesa and the farthest dunes are palest. */
+.mesa {
+  fill: #cf9483;
+}
+
+.mesaShade {
+  fill: #bd8273;
+}
+
+.farSaguaro {
+  fill: none;
+  stroke: #c39272;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .far {
   fill: #e9b98a;
   opacity: 0.8;

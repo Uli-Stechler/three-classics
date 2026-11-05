@@ -9,8 +9,9 @@ export interface ParticleField {
 
 /**
  * @param scale particle-count multiplier: 1 at 1440×900, less on small screens
+ * @param canvas the canvas being drawn, so a field can find its own scene (e.g. to sync with a prop)
  */
-export type ParticleFactory = (width: number, height: number, scale: number) => ParticleField;
+export type ParticleFactory = (width: number, height: number, scale: number, canvas: HTMLCanvasElement) => ParticleField;
 
 interface ParticleCanvasProps {
   create: ParticleFactory;
@@ -50,7 +51,7 @@ export function ParticleCanvas({ create, animate, className }: ParticleCanvasPro
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       const scale = Math.min(1.2, Math.max(0.3, (width * height) / REFERENCE_AREA));
-      field = create(width, height, scale);
+      field = create(width, height, scale, canvas);
       render();
     }
 
