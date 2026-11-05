@@ -1,3 +1,4 @@
+import { Cabin } from './Cabin';
 import { pine } from './pine';
 import styles from './WinterProps.module.css';
 
@@ -82,11 +83,12 @@ function Fox() {
   );
 }
 
-/** The winter scene's animals and objects, placed in the left gutter. */
+/** The winter scene's animals and objects: pines and fox in the left gutter, a cabin beside the board. */
 export function WinterProps() {
   return (
     <>
       <BigPines />
+      <Cabin />
       <Fox />
     </>
   );
