@@ -16,15 +16,16 @@ wall-clock time while building; please replace them with your own time and split
 | 6 | Polish: motion settings, focus, contrast, keyboard tests | 14:44 | 14:51 | ~7 min | `4982395` |
 | 7 | Kubernetes manifests, README, decisions, this log | 14:51 | 14:56 | ~5 min | `da90c63` |
 | 8 | Next day, once Docker was installed: Compose, Testcontainers and kind runs, two Kubernetes fixes | 20:27 | 21:08 | ~41 min | see `git log` |
-|   | **Total** | | | **~2 h 37 min** | |
+| 9 | Scene refresh: rainforest home, sea life, lake and fox, cacti and tumbleweed, hero check, screenshots | 21:36 | 22:35 | ~59 min | `820d479`…`HEAD` |
+|   | **Total** | | | **~3 h 36 min** | |
 
 ## Split by area (approximate)
 
 | Area | Share |
 | --- | --- |
-| Rules engines and their tests | ~22% |
-| Computer players | ~11% |
-| Frontend (boards, shell, scenes) | ~26% |
-| Infrastructure (Docker, Kubernetes) and verifying it | ~30% |
-| Testing and visual review (Playwright, screenshots) | ~7% |
-| Docs | ~4% |
+| Rules engines and their tests | ~16% |
+| Computer players | ~8% |
+| Frontend (boards, shell, scenes) | ~40% |
+| Infrastructure (Docker, Kubernetes) and verifying it | ~21% |
+| Testing and visual review (Playwright, screenshots) | ~10% |
+| Docs | ~5% |

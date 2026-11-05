@@ -181,3 +181,55 @@ Decisions made along the way, by area.
   endpoint change has propagated, the usual fix for this rolling-update race.
 - **Images are loaded, not pulled.** The manifests use `:local` tags with `IfNotPresent`, matching
   `kind load docker-image`. A real cluster would push versioned images to a registry instead.
+
+## Scene refresh
+
+A design-only pass on the four ambient scenes, from a second brief; game logic, the API, boards and
+panel are untouched.
+
+- **What was added.** Home is now a rainforest: a dark canopy band with small light gaps, misty far
+  trunks, warm light shafts, a three-tier waterfall into a pool, buttressed trunks with lianas, and
+  two-tone ferns, monstera, fan palm and heliconia. A toucan, a hanging monkey, a sloth and a snake sit
+  around the edges, and a parrot crosses the canopy about once a minute. The ocean gained a sandy seabed
+  with shells and a starfish, a half-buried treasure chest, a seahorse on its own kelp stem, a fish
+  school, two reef fish, coral and an anemone. In winter every pine tier, near and far, carries a snow
+  cap with a blue shadow side, and the scene has two heavily snowed pines that shed a clump of snow, a
+  frozen lake, and an arctic fox curled on the bank. The desert has a saguaro, a half-sunk cow skull, a
+  prickly pear with one flower, a hazy mesa with two far saguaros, and a tumbleweed.
+- **One biome per scene.** Every animal on the home page is Central or South American. The brief's
+  green tree python is from New Guinea, so the snake is drawn as an emerald tree boa, the Amazon's
+  near-identical look-alike. The ocean is a generic tropical reef (no named species, no clownfish
+  stripes). Winter is boreal, so no penguins. The desert is the American Southwest: no camels or
+  pyramids.
+- **Props get their own layer.** Behind a board the landscape is desaturated to 0.55. The animals and
+  objects sit on a separate layer at 0.8, so they don't turn muddy, and the scrim still covers both.
+  Where a prop meets the ground (the chest's sand, the skull's sand) its colours are pre-muted to match
+  the landscape layer, so it sinks in rather than sitting on top.
+- **Heroes live in the gutters and are tested there.** Props size and place themselves in container
+  units, so the same scene works full-page and in a 280px card. On wide screens a shared `--gutter-mid`
+  centres heroes in the left gutter rather than pinning them to the dark scrimmed edge. A Playwright
+  spec checks that every hero is at least half visible, clear of the board, panel and top bar (cards
+  and title on the home page), at 1440 × 900 and 1920 × 1080.
+- **Motion stays CSS.** Every animation is a keyframe on transform or opacity, and its first frame is
+  the resting pose, so the paused scene looks natural. Crossers (parrot, fish school, tumbleweed) are
+  hidden while paused, so they restart off-screen. The tumbleweed's sand gust reuses the existing
+  particle canvas: factories now get their canvas, and the desert field reads the tumbleweed's own CSS
+  animation clock instead of running a second timer.
+- **Cut or swapped, and why.**
+  - The bottom-right heliconia was removed because it hid the snake.
+  - The light gaps in the canopy were first drawn as bright discs, which read as lamps. They became
+    small lime leaf clusters.
+  - The waterfall began as stacked boulders that read as pillars. It is now a stepped cliff.
+  - The toucan moved below the canopy, where it had been invisible against the dark leaves.
+  - The canopy's solid top band had holes (its rectangle and leaf circles wound in opposite directions)
+    that let pale trunks show behind the subtitle. With the band drawn on its own, the subtitle sits on
+    solid #0E2E1C at about 9:1.
+  - The fox's first drawing read as a mouse. It got a lighter brush tail curled to its nose, a shorter
+    muzzle and a cheek ruff.
+  - Optional extras were left out to stay within about five elements per page: the boardwalk, morpho
+    butterflies and frog on the home page, the jellyfish in the ocean, the wolf in winter, and the lizard
+    and hawk in the desert.
+  - The log cabin was kept, in its own commit, so it is easy to drop.
+- **Phones.** Below 600px each scene keeps one hero and hides crossers and secondary props. On a phone
+  the board and cards fill the width, so even that hero mostly sits behind them. That is acceptable for
+  a page that is about playing.

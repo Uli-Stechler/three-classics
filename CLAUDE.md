@@ -32,6 +32,10 @@ Connect Four, Checkers and Backgammon against the computer. The brief is `docs/r
 - Radial scrim behind the board; board on a solid surface with one soft shadow; WCAG AA text.
 - No scrollbars at 1280×720; playable at 390×844.
 
+## Scenes
+- Props: flat SVG in 2–4 palette tones, dot eyes, no outlines or glows; heroes (`data-prop="hero"`) sit in the gutters in cqw/cqh and stay ≥50% visible (`e2e/scenes.spec.ts`).
+- Motion: CSS keyframes on transform/opacity only, 0% is the rest pose, crossers (`data-crosser`) are rare and hidden when paused; no new canvases or JS loops.
+
 ## Anti-slop
 No purple/indigo gradients, gradient text, neon glows, glassmorphism, emoji or sparkle icons, confetti,
 heavy shadows on rounded-everything, bouncing chrome, hero sections, fake stats/lorem, "Powered by AI",
