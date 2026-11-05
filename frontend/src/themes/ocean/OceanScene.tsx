@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import { SceneFrame, type SceneProps } from '../scene/SceneFrame';
 import type { ParticleFactory } from '../scene/ParticleCanvas';
+import { OceanProps } from './OceanProps';
 import styles from './OceanScene.module.css';
 import './palette.css';
 
@@ -13,7 +14,7 @@ const RAYS = [
   { left: 80, width: 120, tilt: -4, period: 20 },
 ];
 
-// Kelp strands at the bottom edges: left edge (%), height (vh), sway period (s), delay (s).
+// Kelp strands at the bottom edges: left edge (%), height (cqh), sway period (s), delay (s).
 const KELP = [
   { left: 3, height: 34, period: 8, delay: 0 },
   { left: 7, height: 24, period: 7, delay: -2.5 },
@@ -71,7 +72,7 @@ const bubbles: ParticleFactory = (width, height, scale) => {
 
 export function OceanScene(props: SceneProps) {
   return (
-    <SceneFrame name="ocean" particles={bubbles} {...props}>
+    <SceneFrame name="ocean" particles={bubbles} props={<OceanProps />} {...props}>
       <div className={styles.depth} />
       <div className={styles.rays}>
         {RAYS.map((ray, i) => (
@@ -102,9 +103,24 @@ export function OceanScene(props: SceneProps) {
           d="M0 1000 V 820 C 60 790 110 800 160 770 C 210 740 260 760 300 800 C 340 830 380 850 430 880 C 470 905 520 930 560 1000 Z
              M1600 1000 V 800 C 1540 780 1500 790 1450 760 C 1400 735 1350 760 1310 800 C 1270 840 1230 860 1180 900 C 1150 930 1120 960 1100 1000 Z"
         />
+        {/* The sandy seabed, with a lighter lip, a few shells and a starfish. */}
+        <path
+          className={styles.sand}
+          d="M0 1000 V 946 C 120 932 260 950 400 942 C 560 933 700 954 860 946 C 1020 938 1160 956 1320 944 C 1440 936 1540 948 1600 942 V 1000 Z"
+        />
+        <path
+          className={styles.sandLip}
+          d="M0 946 C 120 932 260 950 400 942 C 560 933 700 954 860 946 C 1020 938 1160 956 1320 944 C 1440 936 1540 948 1600 942 V 950 C 1540 956 1440 944 1320 952 C 1160 964 1020 946 860 954 C 700 962 560 941 400 950 C 260 958 120 940 0 954 Z"
+        />
+        <path className={styles.shell} d="M150 978 a9 9 0 0 1 18 0 Z M1176 972 a8 8 0 0 1 16 0 Z M1208 984 a6 6 0 0 1 12 0 Z" />
+        <path className={styles.shellLight} d="M153 978 a6 6 0 0 1 12 0 Z M1179 972 a5 5 0 0 1 10 0 Z" />
+        <path
+          className={styles.starfish}
+          d="M200 958 L204 968 L215 968 L206 975 L210 986 L200 979 L190 986 L194 975 L185 968 L196 968 Z"
+        />
         <path
           className={styles.reefNear}
-          d="M0 1000 V 880 C 40 860 80 870 120 850 C 160 830 200 850 230 880 C 260 910 300 920 340 950 C 360 965 380 985 390 1000 Z
+          d="M232 1000 C 238 962 262 934 300 928 C 340 922 378 946 398 972 C 408 986 412 994 414 1000 Z
              M1600 1000 V 870 C 1560 850 1520 860 1480 840 C 1440 825 1400 845 1370 880 C 1340 915 1300 930 1270 960 C 1255 975 1245 990 1240 1000 Z"
         />
       </svg>
@@ -114,7 +130,7 @@ export function OceanScene(props: SceneProps) {
           className={styles.kelp}
           style={{
             left: `${kelp.left}%`,
-            height: `${kelp.height}vh`,
+            height: `${kelp.height}cqh`,
             animationDuration: `${kelp.period}s`,
             animationDelay: `${kelp.delay}s`,
           }}

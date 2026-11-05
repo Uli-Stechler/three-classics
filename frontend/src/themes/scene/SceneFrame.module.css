@@ -8,11 +8,16 @@
   container-type: size;
   /* How far props keep from the right edge: clear of the side panel on wide game pages. */
   --right-inset: 0px;
+  /* Half the widest board this scene sits behind, and the middle of the gutter to its left. Heroes
+     centre on the gutter when it is wide and fall back to the screen edge when it is not. */
+  --board-half: 382px;
+  --gutter-mid: 0px;
 }
 
 @media (min-width: 1100px) {
   .scene[data-mode='full'] {
     --right-inset: calc(var(--panel-w) + var(--space-4));
+    --gutter-mid: max(0px, calc(((100cqw - var(--right-inset)) / 2 - var(--board-half)) / 2));
   }
 }
 
