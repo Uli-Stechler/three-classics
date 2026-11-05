@@ -1,5 +1,8 @@
 import { SceneFrame, type SceneProps } from '../scene/SceneFrame';
 import type { ParticleFactory } from '../scene/ParticleCanvas';
+import { Lake } from './Lake';
+import { pineRow } from './pine';
+import { WinterProps } from './WinterProps';
 import styles from './WinterScene.module.css';
 import './palette.css';
 
@@ -72,28 +75,12 @@ const snow: ParticleFactory = (width, height, scale) => {
   };
 };
 
-/** A row of snow-laden pines along a baseline. */
-function pines(baseline: number, count: number, height: number, seed: number) {
-  const trees: string[] = [];
-  for (let i = 0; i < count; i++) {
-    const jitter = Math.sin(seed + i * 12.9898) * 0.5 + 0.5;
-    const x = (i + 0.2 + jitter * 0.6) * (1600 / count);
-    const h = height * (0.7 + jitter * 0.5);
-    const w = h * 0.36;
-    const y = baseline + jitter * 10;
-    trees.push(
-      `M${x} ${y - h} L${x + w * 0.35} ${y - h * 0.62} L${x + w * 0.2} ${y - h * 0.62} L${x + w * 0.55} ${y - h * 0.3} L${x + w * 0.3} ${y - h * 0.3} L${x + w * 0.5} ${y} L${x - w * 0.5} ${y} L${x - w * 0.3} ${y - h * 0.3} L${x - w * 0.55} ${y - h * 0.3} L${x - w * 0.2} ${y - h * 0.62} L${x - w * 0.35} ${y - h * 0.62} Z`,
-    );
-  }
-  return trees.join(' ');
-}
-
-const FAR_PINES = pines(745, 26, 70, 3);
-const NEAR_PINES = pines(905, 14, 190, 7);
+const FAR_PINES = pineRow(745, 26, 70, 3);
+const NEAR_PINES = pineRow(905, 14, 190, 7);
 
 export function WinterScene(props: SceneProps) {
   return (
-    <SceneFrame name="winter" particles={snow} {...props}>
+    <SceneFrame name="winter" particles={snow} props={<WinterProps />} {...props}>
       <div className={styles.sky} />
       <div className={styles.aurora} />
       <svg className={styles.land} viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
@@ -109,11 +96,16 @@ export function WinterScene(props: SceneProps) {
           className={styles.ridgeMid}
           d="M0 720 L140 640 L260 690 L400 610 L520 680 L680 620 L820 700 L960 640 L1100 700 L1240 630 L1400 690 L1600 640 V1000 H0 Z"
         />
-        <path className={styles.pinesFar} d={FAR_PINES} />
+        <path className={styles.pinesFar} d={FAR_PINES.tree} />
+        <path className={styles.snowFar} d={FAR_PINES.snow} />
+        <path className={styles.snowFarShade} d={FAR_PINES.shade} />
         <path className={styles.ground} d="M0 820 C 300 790 520 830 800 812 C 1080 795 1300 830 1600 805 V1000 H0 Z" />
-        <path className={styles.pinesNear} d={NEAR_PINES} />
+        <path className={styles.pinesNear} d={NEAR_PINES.tree} />
+        <path className={styles.snowNear} d={NEAR_PINES.snow} />
+        <path className={styles.snowNearShade} d={NEAR_PINES.shade} />
         <path className={styles.drift} d="M0 900 C 260 870 520 905 820 885 C 1100 868 1360 900 1600 880 V1000 H0 Z" />
       </svg>
+      <Lake />
     </SceneFrame>
   );
 }

@@ -54,12 +54,29 @@
   fill: #5f7fa8;
 }
 
+/* Snow caps on every tier; the side away from the light is in blue shadow. */
+.snowFar {
+  fill: #dce6f1;
+}
+
+.snowFarShade {
+  fill: #b5c7dc;
+}
+
 .ground {
   fill: #dfe8f2;
 }
 
 .pinesNear {
   fill: #2c4161;
+}
+
+.snowNear {
+  fill: #eef3f8;
+}
+
+.snowNearShade {
+  fill: #a9c0da;
 }
 
 .drift {
