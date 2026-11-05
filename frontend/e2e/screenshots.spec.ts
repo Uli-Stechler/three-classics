@@ -44,3 +44,15 @@ test('home', async ({ page }) => {
     await page.screenshot({ path: `${OUT}/home-${viewport.width}x${viewport.height}.png` });
   }
 });
+
+// Each card's thumbnail only animates while hovered; 4.3 s in, the desert tumbleweed is rolling past.
+test('home with each card hovered', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  for (const game of GAMES) {
+    await page.mouse.move(0, 0);
+    await page.getByRole('link', { name: new RegExp(`${game.name}$`) }).hover();
+    await page.waitForTimeout(4300);
+    await page.screenshot({ path: `${OUT}/home-1440x900-hover-${slug(game.name)}.png` });
+  }
+});
