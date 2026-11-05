@@ -179,6 +179,10 @@ Decisions made along the way, by area.
 - **Pods pause five seconds before stopping.** One request right after a rollout hit nginx's upstream
   while the Service still routed to the old backend pod. A `preStop` sleep keeps a pod serving until the
   endpoint change has propagated, the usual fix for this rolling-update race.
+- **The app shell is never cached stale.** nginx sent `index.html` with only `Last-Modified`, so
+  browsers guessed a freshness lifetime and opened the previous build from a link until a manual
+  reload. The shell now carries `Cache-Control: no-cache` (a 304 when unchanged), while the hashed
+  files under `/assets/` stay cached for a year.
 - **Images are loaded, not pulled.** The manifests use `:local` tags with `IfNotPresent`, matching
   `kind load docker-image`. A real cluster would push versioned images to a registry instead.
 
