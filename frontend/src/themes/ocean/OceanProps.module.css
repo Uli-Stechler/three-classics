@@ -417,9 +417,9 @@
   right: 7cqw;
 }
 
-/* Phones: keep one hero. */
+/* Phones: keep one hero on the game page (card thumbnails keep both). */
 @media (max-width: 599px) {
-  .seahorse {
+  [data-mode='full'] .seahorse {
     display: none;
   }
 }

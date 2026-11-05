@@ -195,9 +195,9 @@
   display: none;
 }
 
-/* Phones: keep one hero. */
+/* Phones: keep one hero on the game page (card thumbnails keep both). */
 @media (max-width: 599px) {
-  .skull {
+  [data-mode='full'] .skull {
     display: none;
   }
 }
