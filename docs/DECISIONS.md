@@ -30,10 +30,10 @@
   remaining checkers; the brief and standard play use single/gammon/backgammon, so that's what is used.
 - **No accounts.** One local player; stats are computed from finished games in the database.
 - **Spring Boot 3.5, not 4.x**, to keep to APIs I know well inside the time budget.
-- **No Docker on the build machine.** Everything except the containers was run and tested (backend
-  against a local PostgreSQL 16, Playwright against the dev server and the production bundle). The
-  Dockerfiles, compose file and Kubernetes manifests are written and their YAML is validated, but
-  `docker compose up` and kind were not run here. That is the first thing to verify.
+- **Docker arrived late.** The app was built and tested before Docker was installed (backend against a
+  local PostgreSQL 16, Playwright against the dev server and the production bundle). Once Docker was
+  available, Compose, Testcontainers and kind were all run and the suites passed against each; the
+  only changes needed were two Kubernetes startup and rollout fixes (see Infrastructure below).
 - **AI depth is budgeted, not fixed.** Hard searches as deep as it can in about 0.85 s, so its strength
   depends a little on the machine. Medium and Easy are deterministic in effort.
 - **The client draws its own move before the server confirms it.** This keeps input instant. It never
@@ -41,9 +41,10 @@
 
 ## What I'd do next
 
-- Run `docker compose up --build` and `make k8s-up` on a machine with Docker and fix anything they turn
-  up; then add CI (GitHub Actions) running the Maven suite with Testcontainers, Vitest, and Playwright
-  against the compose stack.
+- Add CI (GitHub Actions) running the Maven suite with Testcontainers, Vitest, and Playwright against
+  the Compose stack, plus a kind job that applies `k8s/` and runs the e2e suite through it.
+- Slim the backend image (it is 566 MB on the Ubuntu-based Temurin JRE) with an Alpine or jlink-built
+  runtime.
 - The stretch goals in order: a Hint button (ask Hard), takeback (undo the last move pair from history),
   optional sound, then the backgammon doubling cube.
 - Stronger computer play: an opening book and transposition table for checkers, a perfect-play Connect
@@ -66,9 +67,9 @@ Decisions made along the way, by area.
 - **Java 21 target, built with a newer JDK locally.** The dev machine only has JDK 17 system-wide, so
   local builds use JetBrains Runtime 25 with `--release 21`. Containers build and run on Temurin 21.
 - **Vite 6.** Vite 7+ needs Node 20.19; the dev machine has 20.17. Vitest 3 matches Vite 6.
-- **No Docker on the dev machine.** Compose, Testcontainers and kind could not be run while building.
-  Engines, AI, service and frontend were tested against a portable local PostgreSQL 16 instead. The
-  integration tests use Testcontainers when Docker is present, or `TEST_DATABASE_URL` when it is not.
+- **No Docker on the dev machine at first.** Engines, AI, service and frontend were tested against a
+  portable local PostgreSQL 16 while building. The integration tests use Testcontainers when Docker is
+  present, or `TEST_DATABASE_URL` when it is not, so both setups keep working.
 - **No `@types/node` or jsdom.** Neither is on the approved list. The Vitest suites test pure
   functions, so they need no DOM, and the config files are left out of `tsc`.
 - **Moodboards are git-ignored.** They are Pinterest captures of other people's photos; the brief says
@@ -165,3 +166,18 @@ Decisions made along the way, by area.
 - **Contrast was measured.** All text/surface pairs in the four themes clear WCAG AA (most are 8:1 or
   better). The home page's lagoon teal was deepened from #2F8F86 to #287A72 so white button text
   reaches 5.1:1.
+
+## Infrastructure
+
+- **Verified on Docker Desktop 29 and kind 0.33.** `docker compose up --build` brought all three
+  services up healthy on the first try; the Playwright suite and the Testcontainers-backed API tests
+  pass against it. The same Playwright suite passes through the kind cluster.
+- **The backend waits for Postgres in an init container.** The first kind run showed the backend
+  starting before Postgres accepted connections, so Flyway failed and the pod restarted twice before
+  settling. Compose avoids this with `depends_on: service_healthy`; Kubernetes has no equivalent, so a
+  small `pg_isready` init container now gates startup. A cold start has zero restarts.
+- **Pods pause five seconds before stopping.** One request right after a rollout hit nginx's upstream
+  while the Service still routed to the old backend pod. A `preStop` sleep keeps a pod serving until the
+  endpoint change has propagated, the usual fix for this rolling-update race.
+- **Images are loaded, not pulled.** The manifests use `:local` tags with `IfNotPresent`, matching
+  `kind load docker-image`. A real cluster would push versioned images to a registry instead.

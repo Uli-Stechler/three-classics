@@ -12,6 +12,7 @@ Connect Four, Checkers and Backgammon against the computer. The brief is `docs/r
 - Backend tests: `cd backend && ./mvnw test` (set `TEST_DATABASE_URL` to skip Testcontainers)
 - Frontend: `npm run dev` (proxies /api to :8080), `npm test` (Vitest), `npm run e2e` (Playwright)
 - Backend with dev endpoint: `./mvnw spring-boot:run -Dspring-boot.run.profiles=dev`
+- Kubernetes on kind: `make k8s-up` / `make k8s-down` (README lists the plain commands for Windows)
 
 ## Layout
 - `backend/.../core` shared `GameEngine<S,M>`, `AiPlayer<S,M>`, `Outcome`, `Side`; one package per game

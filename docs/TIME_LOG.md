@@ -1,6 +1,6 @@
 # Time log
 
-Times are taken from the commit timestamps on 3 November 2026 (local time). They are the AI agent's
+Times are taken from the commit timestamps on 3–4 November 2026 (local time). They are the AI agent's
 wall-clock time while building; please replace them with your own time and split.
 
 | # | Milestone | Start | End | Duration | Commit |
@@ -14,16 +14,17 @@ wall-clock time while building; please replace them with your own time and split
 | 4b | Backgammon client, desert scene, step graph, Playwright | 14:20 | 14:38 | ~18 min | `d0b8932` |
 | 5 | Home page, jungle scene, game cards | 14:38 | 14:44 | ~6 min | `a4c812e` |
 | 6 | Polish: motion settings, focus, contrast, keyboard tests | 14:44 | 14:51 | ~7 min | `4982395` |
-| 7 | Kubernetes manifests, README, decisions, this log | 14:51 | 14:56 | ~5 min | see `git log` |
-|   | **Total** | | | **~1 h 56 min** | |
+| 7 | Kubernetes manifests, README, decisions, this log | 14:51 | 14:56 | ~5 min | `da90c63` |
+| 8 | Next day, once Docker was installed: Compose, Testcontainers and kind runs, two Kubernetes fixes | 20:27 | 21:08 | ~41 min | see `git log` |
+|   | **Total** | | | **~2 h 37 min** | |
 
 ## Split by area (approximate)
 
 | Area | Share |
 | --- | --- |
-| Rules engines and their tests | ~30% |
-| Computer players | ~15% |
-| Frontend (boards, shell, scenes) | ~35% |
-| Infrastructure (Docker, Kubernetes) | ~5% |
-| Testing and visual review (Playwright, screenshots) | ~10% |
-| Docs | ~5% |
+| Rules engines and their tests | ~22% |
+| Computer players | ~11% |
+| Frontend (boards, shell, scenes) | ~26% |
+| Infrastructure (Docker, Kubernetes) and verifying it | ~30% |
+| Testing and visual review (Playwright, screenshots) | ~7% |
+| Docs | ~4% |

@@ -12,6 +12,18 @@ spec:
       labels:
         app: backend
     spec:
+      # Kubernetes has no depends_on: wait for Postgres so Flyway doesn't fail and crash-loop at startup.
+      initContainers:
+        - name: wait-for-postgres
+          image: postgres:16-alpine
+          imagePullPolicy: IfNotPresent
+          command: ["sh", "-c", "until pg_isready -h postgres -p 5432 -q; do echo waiting for postgres; sleep 2; done"]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              memory: 64Mi
       containers:
         - name: backend
           image: three-classics-backend:local
@@ -20,6 +32,11 @@ spec:
           ports:
             - name: http
               containerPort: 8080
+          # Keep serving for a moment after removal from the Service, so rollouts drop no requests.
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "5"]
           envFrom:
             - configMapRef:
                 name: backend-config

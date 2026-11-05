@@ -19,9 +19,12 @@ docker compose up --build
 ```
 
 Then open http://localhost:8080. Nothing to configure: every setting has a working default, and
-`.env.example` lists the ones you can override (copy it to `.env`).
+`.env.example` lists the ones you can override (copy it to `.env`). The first build downloads the
+Maven and npm dependencies and takes a few minutes; after that the stack starts in under a minute,
+with healthchecks holding the frontend back until the backend and database are ready.
 
-`make up` / `make down` do the same in the background.
+`make up` / `make down` do the same in the background (or `docker compose up --build -d --wait` and
+`docker compose down`; add `-v` to `down` to wipe the database).
 
 ## What you can do
 
@@ -38,12 +41,21 @@ Then open http://localhost:8080. Nothing to configure: every setting has a worki
 
 | What | Command | Notes |
 | --- | --- | --- |
-| Backend unit + integration | `cd backend && ./mvnw test` | Rules, AI, a 500-game soak per game, and API tests. API tests use Testcontainers when Docker is running, or any Postgres via `TEST_DATABASE_URL` (+ `TEST_DATABASE_USER`/`PASSWORD`). |
+| Backend unit + integration | `cd backend && ./mvnw test` | 80 tests: rules, AI, a 500-game soak per game, and API tests. API tests use Testcontainers when Docker is running, or any Postgres via `TEST_DATABASE_URL` (+ `TEST_DATABASE_USER`/`PASSWORD`). |
 | Frontend unit (Vitest) | `cd frontend && npm ci && npm test` | Legal-prefix matcher, backgammon turn-graph walker, board coordinate mapping for all three boards. |
 | End-to-end + layout (Playwright) | `make e2e` | Starts the compose stack with the dev profile, then runs every spec against http://localhost:8080. |
 | Screenshots | `cd frontend && SCREENSHOTS=1 npx playwright test screenshots` | Rewrites `docs/screenshots/`. |
 
-`make test` runs the backend and Vitest suites.
+`make test` runs the backend and Vitest suites. Without `make` (for example on Windows), `make e2e` is:
+
+```powershell
+$env:SPRING_PROFILES_ACTIVE = 'dev'; docker compose up --build -d --wait
+cd frontend; npm ci; npx playwright install chromium
+$env:E2E_BASE_URL = 'http://localhost:8080'; npx playwright test
+```
+
+Afterwards, `Remove-Item Env:SPRING_PROFILES_ACTIVE; docker compose up -d --wait` puts the backend
+back on the default profile, which hides the dev endpoint.
 
 The Playwright suite covers, for every game: home → game → move → computer replies → restart → home;
 a near-win position → result modal → Play again; resume after refresh; keyboard play; the focus trap;
@@ -69,8 +81,13 @@ cd frontend && npx playwright test
 ## Kubernetes
 
 The same stack runs on a local [kind](https://kind.sigs.k8s.io/) cluster with the Kustomize
-manifests in `k8s/` (namespace, Postgres StatefulSet with a PVC and Secret, backend and frontend
-Deployments and Services with probes, and a ConfigMap).
+manifests in `k8s/`: a namespace, a Postgres StatefulSet with a PVC and Secret, backend and frontend
+Deployments and Services, and a ConfigMap. The backend waits for Postgres in an init container (the
+Kubernetes stand-in for Compose's `depends_on`), has startup, readiness and liveness probes on
+`/actuator/health`, and both Deployments pause briefly on shutdown so rollouts drop no requests.
+
+Compose and the port-forward both use port 8080, so run `docker compose down` first (or forward a
+different port).
 
 ```bash
 make k8s-up
@@ -85,8 +102,12 @@ docker build -t three-classics-backend:local backend
 docker build -t three-classics-frontend:local frontend
 kind load docker-image three-classics-backend:local three-classics-frontend:local --name three-classics
 kubectl apply -k k8s/
+kubectl -n three-classics rollout status deployment/backend --timeout=300s
 kubectl -n three-classics port-forward service/frontend 8080:80
 ```
+
+kind itself is a single binary (`winget install Kubernetes.kind`, `brew install kind`, or a release
+from the kind site); `kubectl` ships with Docker Desktop.
 
 `make k8s-down` deletes the cluster.
 
@@ -167,12 +188,21 @@ docs/                    DECISIONS, TIME_LOG, screenshots, reference material
 
 Hard always answers within about a second; the tests cap it at two.
 
-## Status and honesty notes
+## Verification
 
-- Built and tested on a Windows machine **without Docker**. The backend suites ran against a local
-  PostgreSQL 16, and Playwright ran against both the Vite dev server and the production bundle. The
-  Dockerfiles, `docker-compose.yml` and `k8s/` follow standard patterns and their YAML was validated,
-  but `docker compose up` and the kind deployment have not been run yet.
+Run on Windows 11 with Docker Desktop 29 (Compose v5) and kind 0.33:
+
+- `docker compose up --build` from scratch: all three services healthy, the app served at
+  http://localhost:8080, the backend running as a non-root user, and the dev endpoint hidden (404).
+- Backend: 80 tests pass with Testcontainers starting PostgreSQL 16 in Docker.
+- Playwright (27 tests, e2e and layout at four viewports) passes against the Vite dev server, the
+  production bundle, the Compose stack, and the kind cluster.
+- `kubectl apply -k k8s/` on kind: a cold start comes up with zero restarts.
+
+The app was first built on the same machine before Docker was installed (against a local PostgreSQL),
+so the containers and manifests were verified afterwards; the two fixes that turned up are in
+[docs/DECISIONS.md](docs/DECISIONS.md).
+
 - See [docs/DECISIONS.md](docs/DECISIONS.md) for the main decisions, trade-offs and what I'd do next,
   [docs/TIME_LOG.md](docs/TIME_LOG.md) for the time breakdown, and
   [docs/agent-transcripts/](docs/agent-transcripts/) for the AI agent transcripts.
