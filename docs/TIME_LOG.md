@@ -5,6 +5,7 @@ wall-clock time while building; please replace them with your own time and split
 
 | # | Milestone | Start | End | Duration | Commit |
 | --- | --- | --- | --- | --- | --- |
+| — | Before the build: writing the build brief and, later, the scene-refresh brief with Claude in Cowork (transcript in `docs/agent-transcripts/`) | — | — | ~18 min | — |
 | 0 | Read the brief, check the toolchain, plan and approval | 13:00 | 13:12 | ~12 min | — |
 | 1 | Skeleton: repo, Spring Boot service and schema, React shell, Docker files, CLAUDE.md | 13:12 | 13:31 | ~19 min | `3f204ee` |
 | 2a | Connect Four engine, AI and API tests | 13:31 | 13:39 | ~8 min | `f28c918` |
@@ -16,16 +17,17 @@ wall-clock time while building; please replace them with your own time and split
 | 6 | Polish: motion settings, focus, contrast, keyboard tests | 14:44 | 14:51 | ~7 min | `4982395` |
 | 7 | Kubernetes manifests, README, decisions, this log | 14:51 | 14:56 | ~5 min | `da90c63` |
 | 8 | Next day, once Docker was installed: Compose, Testcontainers and kind runs, two Kubernetes fixes | 20:27 | 21:08 | ~41 min | see `git log` |
-| 9 | Scene refresh: rainforest home, sea life, lake and fox, cacti and tumbleweed, hero check, screenshots | 21:36 | 22:35 | ~59 min | `820d479`…`HEAD` |
-|   | **Total** | | | **~3 h 36 min** | |
+| 9 | Scene refresh: rainforest home, sea life, lake and fox, cacti and tumbleweed, hero check, screenshots | 21:36 | 22:35 | ~59 min | `820d479`…`2ecb26e` |
+|   | **Total** | | | **~3 h 54 min** | |
 
 ## Split by area (approximate)
 
 | Area | Share |
 | --- | --- |
-| Rules engines and their tests | ~16% |
-| Computer players | ~8% |
-| Frontend (boards, shell, scenes) | ~40% |
-| Infrastructure (Docker, Kubernetes) and verifying it | ~21% |
-| Testing and visual review (Playwright, screenshots) | ~10% |
+| Planning and writing the briefs | ~8% |
+| Rules engines and their tests | ~15% |
+| Computer players | ~7% |
+| Frontend (boards, shell, scenes) | ~37% |
+| Infrastructure (Docker, Kubernetes) and verifying it | ~19% |
+| Testing and visual review (Playwright, screenshots) | ~9% |
 | Docs | ~5% |

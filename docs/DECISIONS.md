@@ -188,8 +188,8 @@ Decisions made along the way, by area.
 
 ## Scene refresh
 
-A design-only pass on the four ambient scenes, from a second brief; game logic, the API, boards and
-panel are untouched.
+A design-only pass on the four ambient scenes, from a second brief
+(`docs/reference/scene-refresh-prompt.pdf`); game logic, the API, boards and panel are untouched.
 
 - **What was added.** Home is now a rainforest: a dark canopy band with small light gaps, misty far
   trunks, warm light shafts, a three-tier waterfall into a pool, buttressed trunks with lianas, and
